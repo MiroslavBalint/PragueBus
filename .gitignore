@@ -2,3 +2,4 @@ bin/PragueBus-settings.json
 bin/PragueBus.prg
 bin/PragueBus.prg.debug.xml
 source/Config.mc
+/source/Config.mc
