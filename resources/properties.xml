@@ -1,0 +1,36 @@
+<resources>
+
+    <properties>
+        <property id="useWeatherPosition_prop" type="boolean">false</property>
+        <property id="aroundMeters_prop" type="number">600</property>
+        <property id="maxIndex_prop" type="number">6</property>
+        <property id="maxDepartures_prop" type="number">5</property>
+        <property id="refreshSeconds_prop" type="number">30</property>
+    </properties>
+
+    <strings>
+       <string id="useWeatherPosition_title">Use cached position.</string>
+       <string id="aroundMeters_title">Search circle radius (m).</string>
+       <string id="maxIndex_title">Max count of stops.</string>
+       <string id="maxDepartures_title">Max count of departures.</string>
+       <string id="refreshSeconds_title">Refresh departures every count of seconds.</string>
+    </strings>
+
+    <settings>
+        <setting propertyKey="@Properties.useWeatherPosition_prop" title="@Strings.useWeatherPosition_title">
+            <settingConfig type="boolean" />
+        </setting>
+        <setting propertyKey="@Properties.aroundMeters_prop" title="@Strings.aroundMeters_title">
+            <settingConfig type="numeric" />
+        </setting>
+        <setting propertyKey="@Properties.maxIndex_prop" title="@Strings.maxIndex_title">
+            <settingConfig type="numeric" />
+        </setting>
+        <setting propertyKey="@Properties.maxDepartures_prop" title="@Strings.maxDepartures_title">
+            <settingConfig type="numeric" />
+        </setting>
+        <setting propertyKey="@Properties.refreshSeconds_prop" title="@Strings.refreshSeconds_title">
+            <settingConfig type="numeric" />
+        </setting>
+    </settings>
+</resources>
