@@ -262,7 +262,7 @@ class PragueBusApp extends Application.AppBase {
                             var dep = new $.Departure(typeToString(d["route"]["type"]), d["route"]["short_name"], d["trip"]["headsign"], d["departure_timestamp"]["minutes"]);
                             _busStopPositions[i]._departures.add(dep);
                         }
-                        _pragueBusView.setInfo(_busStopPositions[_index], 0);
+                        _pragueBusView.setInfo(_busStopPositions[_index], _departureStartIndex);
                         break;   
                     }
                 }
@@ -282,6 +282,10 @@ class PragueBusApp extends Application.AppBase {
             return true;
         }
 
+        if(_busStopPositions.size() == 0) {
+            return true;
+        }
+
         if(clickUp) {
             _departureStartIndex = 0;
             _index = _index + 1;
@@ -290,9 +294,12 @@ class PragueBusApp extends Application.AppBase {
             }
         }
         else {
-            _departureStartIndex = _departureStartIndex + 3;
-            if(_departureStartIndex >= _busStopPositions[_index]._departures.size()) {
-                _departureStartIndex = 0;
+            var dep = _busStopPositions[_index]._departures;
+            if(dep != null && dep.size() > 0) {
+                _departureStartIndex = _departureStartIndex + 3;
+                if(_departureStartIndex >= dep.size()) {
+                    _departureStartIndex = 0;
+                }
             }
         }
 
