@@ -1,14 +1,16 @@
+import Toybox.Lang;
 import Toybox.Graphics;
 import Toybox.Math;
 import Toybox.WatchUi;
 
 class PragueBusView extends WatchUi.View {
 
-    private var _lines as Array<String>;
+    private var _lines = [] as Array<String>;
     private var _drawTable as Boolean;
 
     function initialize() {
         View.initialize();
+        _drawTable = false;
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -52,7 +54,7 @@ class PragueBusView extends WatchUi.View {
         WatchUi.requestUpdate();
     }
 
-    private function min(a, b) as Boolean {
+    private function min(a, b) as Number {
         if(a < b) {
             return a;
         }
@@ -69,10 +71,10 @@ class PragueBusView extends WatchUi.View {
         // Print the arguments duplicated and returned by jsonplaceholder.typicode.com
         _lines.add(info._dist + " m " + info._i + "/" + info._max);
         _lines.add(info._name);
-        if(info._departures) {
+        if(info._departures != null) {
             for(var i = start; i < min(start + 3, info._departures.size()); i++) {
                 var d = info._departures[i];
-                _lines.add(d._type + " " + d._name + " " + d._time + " min ");
+                _lines.add(d._time + " min " + d._type + " " + d._name);
                 _lines.add(d._headSign);
             }
         }

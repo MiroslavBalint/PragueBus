@@ -8,3 +8,17 @@ Garmin project for Prague public transport timetables
 
 Cached location is retrieved from weather module. It is location of the smartphone. This location is updated every 20 minutes or depending on the smartphone settings.
 
+Changelog:
+
+version 1.1
+    Add support for new devices.
+    Add support for button listing.
+    New SDK 4.1.7
+    Fix listing and refresh.
+
+version 1.0
+    Init
+
+
+
+

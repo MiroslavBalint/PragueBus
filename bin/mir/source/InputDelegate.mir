@@ -1,0 +1,129 @@
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 7; ]
+import Toybox.Lang;
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 8; ]
+import Toybox.System;
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 9; ]
+import Toybox.WatchUi;
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 10; ]
+import Toybox.Graphics;
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 13; ]
+class InputDelegate extends WatchUi.BehaviorDelegate{
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 13; ]
+    <init> {
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 13; ]
+    static
+    <init> {
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 14; @position = 16; ]
+    private
+    var _notify as (callback(clickUp as Boolean) as Boolean);
+    //! Constructor
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 17; ]
+    public
+    function initialize(handler as (callback(clickUp as Boolean) as Boolean)) as Void {
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_17_81_start:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 18 8 ]
+        %tmp.2 = getv ? :BehaviorDelegate;
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 19 8 ]
+        %tmp.5 = lgetv %handler;
+        putv self :_notify %tmp.5;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_17_81_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 22; ]
+    public
+    function onTap(clickEvent) as Boolean {
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_22_49_start:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 23 8 ]
+        %tmp.2 = getv ? :_notify;
+        %tmp.3 = getv function %tmp.2 :invoke;
+        %tmp.4 = lgetv %clickEvent;
+        %tmp.5 = getv function %tmp.4 :getCoordinates;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        %tmp.7 = 1;
+        %tmp.8 = agetv %tmp.6 %tmp.7;
+        %tmp.9 = getm $.Toybox.System;
+        %tmp.10 = getv function %tmp.9 :getDeviceSettings;
+        %tmp.11 = invoke %tmp.9 %tmp.10();
+        %tmp.12 = getv %tmp.11 :screenHeight;
+        %tmp.13 = 2;
+        %tmp.14 = div %tmp.12 %tmp.13;
+        %tmp.15 = lt %tmp.8 %tmp.14;
+        invoke %tmp.2 %tmp.3(%tmp.15);
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 24 8 ]
+        %tmp.16 = true;
+        ret %tmp.16;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_22_49_stop:
+    }
+    //! Handle a physical button being pressed and released
+    //! @param evt The key event that occurred
+    //! @return true if handled, false otherwise
+    [ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 30; ]
+    public
+    function onKeyReleased(evt as KeyEvent) as Boolean {
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_30_62_start:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 31 8 ]
+        [ "C_Project_Garmin_PragueBus_source_InputDelegate_mc_30_62_start" "C_Project_Garmin_PragueBus_source_InputDelegate_mc_30_62_stop" ]
+        %key.1 = local;
+        %tmp.1 = lgetv %evt;
+        %tmp.2 = getv function %tmp.1 :getKey;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %key.1 %tmp.3;
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 32 8 ]
+        %tmp.5 = lgetv %key.1;
+        push %tmp.5;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_switchCaseBegin:
+        %tmp.6 = dup %tmp.5;
+        %tmp.8 = getv ? :KEY_UP;
+        %tmp.9 = getv function %tmp.6 :equals;
+        %tmp.10 = invoke %tmp.6 %tmp.9 (%tmp.8);
+        bt %tmp.10 @C_Project_Garmin_PragueBus_source_InputDelegate_mc_34_12;
+        %tmp.11 = dup %tmp.5;
+        %tmp.13 = getv ? :KEY_DOWN;
+        %tmp.14 = getv function %tmp.11 :equals;
+        %tmp.15 = invoke %tmp.11 %tmp.14 (%tmp.13);
+        bt %tmp.15 @C_Project_Garmin_PragueBus_source_InputDelegate_mc_38_12;
+        %tmp.16 = dup %tmp.5;
+        %tmp.18 = getv ? :KEY_ENTER;
+        %tmp.19 = getv function %tmp.16 :equals;
+        %tmp.20 = invoke %tmp.16 %tmp.19 (%tmp.18);
+        bt %tmp.20 @C_Project_Garmin_PragueBus_source_InputDelegate_mc_42_12;
+        goto @C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_defaultCodeBegin;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_34_12:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 35 16 ]
+        %tmp.22 = getv ? :_notify;
+        %tmp.23 = getv function %tmp.22 :invoke;
+        %tmp.24 = true;
+        invoke %tmp.22 %tmp.23(%tmp.24);
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 36 16 ]
+        goto @C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_switchCaseEnd;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_38_12:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 39 16 ]
+        %tmp.26 = getv ? :_notify;
+        %tmp.27 = getv function %tmp.26 :invoke;
+        %tmp.28 = false;
+        invoke %tmp.26 %tmp.27(%tmp.28);
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 40 16 ]
+        goto @C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_switchCaseEnd;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_42_12:
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 43 16 ]
+        %tmp.30 = getv ? :_notify;
+        %tmp.31 = getv function %tmp.30 :invoke;
+        %tmp.32 = true;
+        invoke %tmp.30 %tmp.31(%tmp.32);
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 44 16 ]
+        goto @C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_switchCaseEnd;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_defaultCodeBegin:
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_32_8_switchCaseEnd:
+        pop;
+[ "C:\Project\Garmin\PragueBus\source\InputDelegate.mc" 46 8 ]
+        %tmp.33 = false;
+        ret %tmp.33;
+C_Project_Garmin_PragueBus_source_InputDelegate_mc_30_62_stop:
+    }
+}
+[ @file = "C:\Project\Garmin\PragueBus\source\InputDelegate.mc"; @line = 7; ]
+<init> {
+}

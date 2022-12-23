@@ -1,0 +1,1557 @@
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 1; ]
+import Toybox.Application;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 2; ]
+import Toybox.Application.Storage;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 3; ]
+import Toybox.Lang;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 4; ]
+import Toybox.Position;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 5; ]
+import Toybox.WatchUi;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 6; ]
+import Toybox.System;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 7; ]
+import Toybox.Timer;
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 9; ]
+class PragueBusApp extends Application.AppBase{
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 9; ]
+    <init> {
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 9; ]
+    static
+    <init> {
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 11; @position = 16; ]
+    private
+    var _pragueBusView as PragueBusView;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 12; @position = 16; ]
+    private
+    var _busStopDelegate as BusStopDelegate;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 13; @position = 16; ]
+    private
+    var _departuresDelegate as DeparturesDelegate;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 14; @position = 16; ]
+    private
+    var _busStopPositions as Array<BusStop>;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 15; @position = 16; ]
+    private
+    var _index as Number;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 16; @position = 16; ]
+    private
+    var _pos as Position.Location or Null;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 17; @position = 16; ]
+    private
+    var _accuracy as Number;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 18; @position = 16; ]
+    private
+    var _departureStartIndex as Number;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 19; @position = 16; ]
+    private
+    var _timer;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 20; @position = 16; ]
+    private
+    var _refreshSeconds as Number;
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 22; ]
+    function initialize() as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_22_26_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 23 8 ]
+        %tmp.2 = getv ? :AppBase;
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 24 8 ]
+        %tmp.7 = getm $;
+        %tmp.8 = getv %tmp.7 :PragueBusView;
+        %tmp.4 = newc %tmp.8 ();
+        putv self :_pragueBusView %tmp.4;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 25 8 ]
+        %tmp.12 = getm $;
+        %tmp.13 = getv %tmp.12 :BusStopDelegate;
+        %tmp.14 = self;
+        %tmp.15 = getv function %tmp.14 :method;
+        %tmp.17 = const :onReceive;
+        %tmp.18 = invoke %tmp.14 %tmp.15(%tmp.17);
+        %tmp.9 = newc %tmp.13 (%tmp.18);
+        putv self :_busStopDelegate %tmp.9;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 26 8 ]
+        %tmp.22 = getm $;
+        %tmp.23 = getv %tmp.22 :DeparturesDelegate;
+        %tmp.24 = self;
+        %tmp.25 = getv function %tmp.24 :method;
+        %tmp.27 = const :onReceiveDepartures;
+        %tmp.28 = invoke %tmp.24 %tmp.25(%tmp.27);
+        %tmp.19 = newc %tmp.23 (%tmp.28);
+        putv self :_departuresDelegate %tmp.19;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 27 8 ]
+        %tmp.29 = 0;
+        putv self :_index %tmp.29;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 28 8 ]
+        %tmp.30 = newa 0;
+        putv self :_busStopPositions %tmp.30;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 29 8 ]
+        %tmp.31 = 0;
+        putv self :_departureStartIndex %tmp.31;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 30 8 ]
+        %tmp.33 = getv ? :Properties;
+        %tmp.34 = getv function %tmp.33 :getValue;
+        %tmp.35 = "refreshSeconds_prop";
+        %tmp.36 = invoke %tmp.33 %tmp.34(%tmp.35);
+        %tmp.37 = getv function %tmp.36 :toNumber;
+        %tmp.38 = invoke %tmp.36 %tmp.37();
+        putv self :_refreshSeconds %tmp.38;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 31 8 ]
+        %tmp.41 = getm $.Toybox.Timer;
+        %tmp.42 = getv function ? %tmp.41 :Timer;
+        %tmp.39 = newc %tmp.42 ();
+        putv self :_timer %tmp.39;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 32 8 ]
+        %tmp.43 = 0;
+        putv self :_accuracy %tmp.43;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 33 8 ]
+        %tmp.44 = null;
+        putv self :_pos %tmp.44;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_22_26_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 37; ]
+    function onStart(state as Dictionary or Null) as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_37_51_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 38 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_8_if_stmt:
+        %tmp.1 = getm $.Toybox.System;
+        %tmp.2 = getv function %tmp.1 :getDeviceSettings;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        %tmp.4 = getv %tmp.3 :phoneConnected;
+        %tmp.5 = not %tmp.4;
+        bf %tmp.5 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_55_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 39 12 ]
+        %tmp.7 = getv ? :_pragueBusView;
+        %tmp.8 = getv function %tmp.7 :setText;
+        %tmp.9 = newa 1;
+        %tmp.10 = "Phone not connected";
+        %tmp.11 = dup %tmp.9;
+        %tmp.12 = aputv %tmp.11 0 %tmp.10;
+        invoke %tmp.7 %tmp.8(%tmp.12);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 40 12 ]
+        ret ?;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_55_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_38_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 42 8 ]
+        %tmp.14 = getv ? :_pragueBusView;
+        %tmp.15 = getv function %tmp.14 :setText;
+        %tmp.16 = newa 2;
+        %tmp.17 = "Wait for location";
+        %tmp.18 = dup %tmp.16;
+        %tmp.19 = aputv %tmp.18 0 %tmp.17;
+        %tmp.20 = "Tap from weather";
+        %tmp.21 = dup %tmp.19;
+        %tmp.22 = aputv %tmp.21 1 %tmp.20;
+        invoke %tmp.14 %tmp.15(%tmp.22);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 43 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_stmt:
+        %tmp.24 = getv ? :Properties;
+        %tmp.25 = getv function %tmp.24 :getValue;
+        %tmp.26 = "useWeatherPosition_prop";
+        %tmp.27 = invoke %tmp.24 %tmp.25(%tmp.26);
+        bf %tmp.27 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_59_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 44 12 ]
+        %tmp.28 = self;
+        %tmp.29 = getv function %tmp.28 :onPosition;
+        %tmp.31 = getv ? :Weather;
+        %tmp.32 = getv function %tmp.31 :getCurrentConditions;
+        %tmp.33 = invoke %tmp.31 %tmp.32();
+        %tmp.34 = getv %tmp.33 :observationLocationPosition;
+        %tmp.35 = 9;
+        invoke %tmp.28 %tmp.29(%tmp.34, %tmp.35);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_59_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_46_13_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 47 12 ]
+        %tmp.37 = getv ? :Activity;
+        %tmp.38 = getv %tmp.37 :Info;
+        %tmp.39 = getv %tmp.38 :currentLocation;
+        putv self :_pos %tmp.39;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 48 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_stmt:
+        %tmp.41 = getv ? :_pos;
+        %tmp.42 = null;
+        %tmp.43 = ne %tmp.41 %tmp.42;
+        bf %tmp.43 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_29_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 49 16 ]
+        %tmp.44 = self;
+        %tmp.45 = getv function %tmp.44 :onPosition;
+        %tmp.47 = getv ? :_pos;
+        %tmp.48 = as %tmp.47 { (!Null) };
+        %tmp.50 = getv ? :Activity;
+        %tmp.51 = getv %tmp.50 :Info;
+        %tmp.52 = getv %tmp.51 :currentLocationAccuracy;
+        invoke %tmp.44 %tmp.45(%tmp.48, %tmp.52);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_29_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_51_17_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 52 16 ]
+        %tmp.53 = getm $.Toybox.Position;
+        %tmp.54 = getv function %tmp.53 :enableLocationEvents;
+        %tmp.55 = getm $.Toybox.Position;
+        %tmp.56 = getv %tmp.55 :LOCATION_ONE_SHOT;
+        %tmp.57 = self;
+        %tmp.58 = getv function %tmp.57 :method;
+        %tmp.60 = const :onPositionInfo;
+        %tmp.61 = invoke %tmp.57 %tmp.58(%tmp.60);
+        invoke %tmp.53 %tmp.54(%tmp.56, %tmp.61);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_51_17_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_48_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_46_13_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_43_8_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_37_51_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 58; ]
+    function onStop(state as Dictionary or Null) as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_58_50_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 59 8 ]
+        %tmp.1 = getm $.Toybox.Position;
+        %tmp.2 = getv function %tmp.1 :enableLocationEvents;
+        %tmp.3 = getm $.Toybox.Position;
+        %tmp.4 = getv %tmp.3 :LOCATION_DISABLE;
+        %tmp.5 = self;
+        %tmp.6 = getv function %tmp.5 :method;
+        %tmp.8 = const :onPositionInfo;
+        %tmp.9 = invoke %tmp.5 %tmp.6(%tmp.8);
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.9);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 60 8 ]
+        %tmp.11 = getv ? :_timer;
+        %tmp.12 = getv function %tmp.11 :stop;
+        invoke %tmp.11 %tmp.12();
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_58_50_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 63; ]
+    public
+    function onPosition(pos as Position.Location, accuracy as Position.Quality or Number) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_63_97_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 64 8 ]
+        %tmp.2 = lgetv %pos;
+        putv self :_pos %tmp.2;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 65 8 ]
+        %tmp.3 = lgetv %accuracy;
+        %tmp.4 = getv function %tmp.3 :toNumber;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        putv self :_accuracy %tmp.5;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 66 8 ]
+        %tmp.7 = getv ? :_busStopDelegate;
+        %tmp.8 = getv function %tmp.7 :makeRequest;
+        %tmp.10 = getv ? :_pos;
+        %tmp.12 = getv ? :Properties;
+        %tmp.13 = getv function %tmp.12 :getValue;
+        %tmp.14 = "aroundMeters_prop";
+        %tmp.15 = invoke %tmp.12 %tmp.13(%tmp.14);
+        %tmp.16 = getv function %tmp.15 :toNumber;
+        %tmp.17 = invoke %tmp.15 %tmp.16();
+        invoke %tmp.7 %tmp.8(%tmp.10, %tmp.17);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_63_97_stop:
+    }
+    //! Update the current position
+    //! @param info Position information
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 71; ]
+    public
+    function onPositionInfo(info as Info) as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_71_57_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 72 8 ]
+        %tmp.1 = self;
+        %tmp.2 = getv function %tmp.1 :onPosition;
+        %tmp.3 = lgetv %info;
+        %tmp.4 = getv %tmp.3 :position;
+        %tmp.5 = lgetv %info;
+        %tmp.6 = getv %tmp.5 :accuracy;
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_71_57_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 75; ]
+    public
+    function getInfo() {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_75_30_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 76 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_8_if_stmt:
+        %tmp.2 = getv ? :_busStopPositions;
+        %tmp.3 = getv function %tmp.2 :size;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        %tmp.5 = 0;
+        %tmp.6 = eq %tmp.4 %tmp.5;
+        bf %tmp.6 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_42_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 77 12 ]
+        ret ?;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_42_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_76_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 80 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_75_30_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_75_30_stop" ]
+        %currStop.1 = local;
+        %tmp.8 = getv ? :_busStopPositions;
+        %tmp.10 = getv ? :_index;
+        %tmp.11 = agetv %tmp.8 %tmp.10;
+        lputv %currStop.1 %tmp.11;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 81 8 ]
+        %tmp.13 = getv ? :_departuresDelegate;
+        %tmp.14 = getv function %tmp.13 :makeRequest;
+        %tmp.16 = getv ? :Properties;
+        %tmp.17 = getv function %tmp.16 :getValue;
+        %tmp.18 = "maxDepartures_prop";
+        %tmp.19 = invoke %tmp.16 %tmp.17(%tmp.18);
+        %tmp.20 = getv function %tmp.19 :toString;
+        %tmp.21 = invoke %tmp.19 %tmp.20();
+        %tmp.22 = lgetv %currStop.1;
+        %tmp.23 = getv %tmp.22 :_name;
+        invoke %tmp.13 %tmp.14(%tmp.21, %tmp.23);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 82 8 ]
+        %tmp.25 = getv ? :_pragueBusView;
+        %tmp.26 = getv function %tmp.25 :setInfo;
+        %tmp.28 = lgetv %currStop.1;
+        %tmp.30 = getv ? :_departureStartIndex;
+        invoke %tmp.25 %tmp.26(%tmp.28, %tmp.30);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_75_30_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 85; ]
+    function degrees_to_radians(deg) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_85_37_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 86 8 ]
+        %tmp.2 = lgetv %deg;
+        %tmp.4 = getv ? :Math;
+        %tmp.5 = getv %tmp.4 :PI;
+        %tmp.6 = mul %tmp.2 %tmp.5;
+        %tmp.7 = 180;
+        %tmp.8 = div %tmp.6 %tmp.7;
+        ret %tmp.8;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_85_37_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 89; ]
+    function Geodetic_distance_deg(lat1, lon1, lat2, lon2) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_89_59_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 90 8 ]
+        %tmp.1 = self;
+        %tmp.2 = getv function %tmp.1 :degrees_to_radians;
+        %tmp.4 = lgetv %lat1;
+        %tmp.5 = invoke %tmp.1 %tmp.2(%tmp.4);
+        lputv %lat1 %tmp.5;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 91 8 ]
+        %tmp.6 = self;
+        %tmp.7 = getv function %tmp.6 :degrees_to_radians;
+        %tmp.9 = lgetv %lon1;
+        %tmp.10 = invoke %tmp.6 %tmp.7(%tmp.9);
+        lputv %lon1 %tmp.10;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 92 8 ]
+        %tmp.11 = self;
+        %tmp.12 = getv function %tmp.11 :degrees_to_radians;
+        %tmp.14 = lgetv %lat2;
+        %tmp.15 = invoke %tmp.11 %tmp.12(%tmp.14);
+        lputv %lat2 %tmp.15;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 93 8 ]
+        %tmp.16 = self;
+        %tmp.17 = getv function %tmp.16 :degrees_to_radians;
+        %tmp.19 = lgetv %lon2;
+        %tmp.20 = invoke %tmp.16 %tmp.17(%tmp.19);
+        lputv %lon2 %tmp.20;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 95 8 ]
+        %tmp.21 = self;
+        %tmp.22 = getv function %tmp.21 :Geodetic_distance_rad;
+        %tmp.24 = lgetv %lat1;
+        %tmp.26 = lgetv %lon1;
+        %tmp.28 = lgetv %lat2;
+        %tmp.30 = lgetv %lon2;
+        %tmp.31 = invoke %tmp.21 %tmp.22(%tmp.24, %tmp.26, %tmp.28, %tmp.30);
+        ret %tmp.31;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_89_59_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 98; ]
+    function Geodetic_distance_rad(lat1, lon1, lat2, lon2) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 99 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %dy.1 = local;
+        %tmp.2 = lgetv %lat2;
+        %tmp.4 = lgetv %lat1;
+        %tmp.5 = sub %tmp.2 %tmp.4;
+        lputv %dy.1 %tmp.5;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 100 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %dx.2 = local;
+        %tmp.7 = lgetv %lon2;
+        %tmp.9 = lgetv %lon1;
+        %tmp.10 = sub %tmp.7 %tmp.9;
+        lputv %dx.2 %tmp.10;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 102 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %sy.3 = local;
+        %tmp.12 = getv ? :Math;
+        %tmp.13 = getv function %tmp.12 :sin;
+        %tmp.15 = lgetv %dy.1;
+        %tmp.16 = 2;
+        %tmp.17 = div %tmp.15 %tmp.16;
+        %tmp.18 = invoke %tmp.12 %tmp.13(%tmp.17);
+        lputv %sy.3 %tmp.18;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 103 8 ]
+        %tmp.19 = lgetv %sy.3;
+        %tmp.21 = lgetv %sy.3;
+        %tmp.22 = mul %tmp.19 %tmp.21;
+        lputv %sy.3 %tmp.22;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 105 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %sx.4 = local;
+        %tmp.24 = getv ? :Math;
+        %tmp.25 = getv function %tmp.24 :sin;
+        %tmp.27 = lgetv %dx.2;
+        %tmp.28 = 2;
+        %tmp.29 = div %tmp.27 %tmp.28;
+        %tmp.30 = invoke %tmp.24 %tmp.25(%tmp.29);
+        lputv %sx.4 %tmp.30;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 106 8 ]
+        %tmp.31 = lgetv %sx.4;
+        %tmp.33 = lgetv %sx.4;
+        %tmp.34 = mul %tmp.31 %tmp.33;
+        lputv %sx.4 %tmp.34;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 108 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %a.5 = local;
+        %tmp.36 = lgetv %sy.3;
+        %tmp.38 = getv ? :Math;
+        %tmp.39 = getv function %tmp.38 :cos;
+        %tmp.41 = lgetv %lat1;
+        %tmp.42 = invoke %tmp.38 %tmp.39(%tmp.41);
+        %tmp.44 = getv ? :Math;
+        %tmp.45 = getv function %tmp.44 :cos;
+        %tmp.47 = lgetv %lat2;
+        %tmp.48 = invoke %tmp.44 %tmp.45(%tmp.47);
+        %tmp.49 = mul %tmp.42 %tmp.48;
+        %tmp.51 = lgetv %sx.4;
+        %tmp.52 = mul %tmp.49 %tmp.51;
+        %tmp.53 = add %tmp.36 %tmp.52;
+        lputv %a.5 %tmp.53;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 111 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %c.6 = local;
+        %tmp.54 = 2;
+        %tmp.56 = getv ? :Math;
+        %tmp.57 = getv function %tmp.56 :atan2;
+        %tmp.59 = getv ? :Math;
+        %tmp.60 = getv function %tmp.59 :sqrt;
+        %tmp.62 = lgetv %a.5;
+        %tmp.63 = invoke %tmp.59 %tmp.60(%tmp.62);
+        %tmp.65 = getv ? :Math;
+        %tmp.66 = getv function %tmp.65 :sqrt;
+        %tmp.67 = 1;
+        %tmp.69 = lgetv %a.5;
+        %tmp.70 = sub %tmp.67 %tmp.69;
+        %tmp.71 = invoke %tmp.65 %tmp.66(%tmp.70);
+        %tmp.72 = invoke %tmp.56 %tmp.57(%tmp.63, %tmp.71);
+        %tmp.73 = mul %tmp.54 %tmp.72;
+        lputv %c.6 %tmp.73;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 113 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop" ]
+        %R.7 = local;
+        %tmp.74 = 6371000;
+        lputv %R.7 %tmp.74;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 114 8 ]
+        %tmp.76 = lgetv %R.7;
+        %tmp.78 = lgetv %c.6;
+        %tmp.79 = mul %tmp.76 %tmp.78;
+        ret %tmp.79;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_98_59_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 117; ]
+    public
+    function split(str as String, delim as Char) as Array<String> {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_117_73_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 118 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_117_73_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_117_73_stop" ]
+        %arr.1 = local;
+        %tmp.1 = newa Array<String> 0;
+        lputv %arr.1 %tmp.1;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 119 8 ]
+        while @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_test:
+        %tmp.2 = lgetv %str;
+        %tmp.3 = getv function %tmp.2 :find;
+        %tmp.4 = lgetv %delim;
+        %tmp.5 = getv function %tmp.4 :toString;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        %tmp.7 = invoke %tmp.2 %tmp.3(%tmp.6);
+        %tmp.8 = null;
+        %tmp.9 = ne %tmp.7 %tmp.8;
+        bf %tmp.9 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_120_8_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 121 12 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_120_8_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_120_8_stop" ]
+        %pos.2 = local;
+        %tmp.10 = lgetv %str;
+        %tmp.11 = getv function %tmp.10 :find;
+        %tmp.12 = lgetv %delim;
+        %tmp.13 = getv function %tmp.12 :toString;
+        %tmp.14 = invoke %tmp.12 %tmp.13();
+        %tmp.15 = invoke %tmp.10 %tmp.11(%tmp.14);
+        lputv %pos.2 %tmp.15;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 122 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_stmt:
+        %tmp.17 = lgetv %pos.2;
+        %tmp.18 = 0;
+        %tmp.19 = eq %tmp.17 %tmp.18;
+        bf %tmp.19 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_123_12_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 124 16 ]
+        %tmp.20 = lgetv %str;
+        %tmp.21 = getv function %tmp.20 :substring;
+        %tmp.22 = 1;
+        %tmp.23 = lgetv %str;
+        %tmp.24 = getv function %tmp.23 :length;
+        %tmp.25 = invoke %tmp.23 %tmp.24();
+        %tmp.26 = invoke %tmp.20 %tmp.21(%tmp.22, %tmp.25);
+        lputv %str %tmp.26;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_123_12_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_127_12_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 128 16 ]
+        %tmp.27 = lgetv %arr.1;
+        %tmp.28 = getv function %tmp.27 :add;
+        %tmp.29 = lgetv %str;
+        %tmp.30 = getv function %tmp.29 :substring;
+        %tmp.31 = 0;
+        %tmp.33 = lgetv %pos.2;
+        %tmp.34 = invoke %tmp.29 %tmp.30(%tmp.31, %tmp.33);
+        invoke %tmp.27 %tmp.28(%tmp.34);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 129 16 ]
+        %tmp.35 = lgetv %str;
+        %tmp.36 = getv function %tmp.35 :substring;
+        %tmp.38 = lgetv %pos.2;
+        %tmp.39 = lgetv %str;
+        %tmp.40 = getv function %tmp.39 :length;
+        %tmp.41 = invoke %tmp.39 %tmp.40();
+        %tmp.42 = invoke %tmp.35 %tmp.36(%tmp.38, %tmp.41);
+        lputv %str %tmp.42;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_127_12_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_122_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_120_8_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_119_8_while_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 132 8 ]
+        %tmp.43 = lgetv %arr.1;
+        %tmp.44 = getv function %tmp.43 :add;
+        %tmp.46 = lgetv %str;
+        invoke %tmp.43 %tmp.44(%tmp.46);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 133 8 ]
+        %tmp.48 = lgetv %arr.1;
+        ret %tmp.48;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_117_73_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 136; ]
+    private
+    function busStopExists(s as String) as Boolean {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_136_59_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 137 8 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_end" ]
+        %i.1 = local;
+        %tmp.1 = 0;
+        lputv %i.1 %tmp.1;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_test:
+        %tmp.3 = lgetv %i.1;
+        %tmp.5 = getv ? :_busStopPositions;
+        %tmp.6 = getv function %tmp.5 :size;
+        %tmp.7 = invoke %tmp.5 %tmp.6();
+        %tmp.8 = lt %tmp.3 %tmp.7;
+        bf %tmp.8 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_58_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 138 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_12_if_stmt:
+        %tmp.10 = getv ? :_busStopPositions;
+        %tmp.12 = lgetv %i.1;
+        %tmp.13 = agetv %tmp.10 %tmp.12;
+        %tmp.14 = getv %tmp.13 :_name;
+        %tmp.16 = lgetv %s;
+        %tmp.17 = eq %tmp.14 %tmp.16;
+        bf %tmp.17 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_48_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 139 16 ]
+        %tmp.18 = true;
+        ret %tmp.18;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_48_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_138_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_58_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 137 ]
+        %tmp.21 = lgetv %i.1;
+        %tmp.22 = add %tmp.21 1;
+        lputv %i.1 %tmp.22;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_137_8_for_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 142 8 ]
+        %tmp.23 = false;
+        ret %tmp.23;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_136_59_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 145; ]
+    public
+    function compareByDist(a, b) as Boolean {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_145_51_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 146 8 ]
+        %tmp.1 = lgetv %a;
+        %tmp.2 = getv %tmp.1 :_dist;
+        %tmp.3 = lgetv %b;
+        %tmp.4 = getv %tmp.3 :_dist;
+        %tmp.5 = gt %tmp.2 %tmp.4;
+        ret %tmp.5;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_145_51_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 150; ]
+    function bubbleSort(arr as Array, compare) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_150_47_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 151 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_150_47_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_150_47_stop" ]
+        %n.1 = local;
+        %tmp.1 = lgetv %arr;
+        %tmp.2 = getv function %tmp.1 :size;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %n.1 %tmp.3;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 152 8 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_end" ]
+        %i.2 = local;
+        %tmp.4 = 0;
+        lputv %i.2 %tmp.4;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_test:
+        %tmp.6 = lgetv %i.2;
+        %tmp.8 = lgetv %n.1;
+        %tmp.9 = 1;
+        %tmp.10 = sub %tmp.8 %tmp.9;
+        %tmp.11 = lt %tmp.6 %tmp.10;
+        bf %tmp.11 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_40_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 154 12 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_end" ]
+        %j.3 = local;
+        %tmp.12 = 0;
+        lputv %j.3 %tmp.12;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_test:
+        %tmp.14 = lgetv %j.3;
+        %tmp.16 = lgetv %n.1;
+        %tmp.18 = lgetv %i.2;
+        %tmp.19 = sub %tmp.16 %tmp.18;
+        %tmp.20 = 1;
+        %tmp.21 = sub %tmp.19 %tmp.20;
+        %tmp.22 = lt %tmp.14 %tmp.21;
+        bf %tmp.22 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_48_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 155 16 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_16_if_stmt:
+        %tmp.23 = lgetv %compare;
+        %tmp.24 = getv function %tmp.23 :invoke;
+        %tmp.26 = lgetv %arr;
+        %tmp.28 = lgetv %j.3;
+        %tmp.29 = agetv %tmp.26 %tmp.28;
+        %tmp.31 = lgetv %arr;
+        %tmp.33 = lgetv %j.3;
+        %tmp.34 = 1;
+        %tmp.35 = add %tmp.33 %tmp.34;
+        %tmp.36 = agetv %tmp.31 %tmp.35;
+        %tmp.37 = invoke %tmp.23 %tmp.24(%tmp.29, %tmp.36);
+        bf %tmp.37 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_16_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_56_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 156 20 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_56_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_56_stop" ]
+        %tmp.4 = local;
+        %tmp.39 = lgetv %arr;
+        %tmp.41 = lgetv %j.3;
+        %tmp.42 = 1;
+        %tmp.43 = add %tmp.41 %tmp.42;
+        %tmp.44 = agetv %tmp.39 %tmp.43;
+        lputv %tmp.4 %tmp.44;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 157 20 ]
+        %tmp.45 = lgetv %arr;
+        %tmp.47 = lgetv %arr;
+        %tmp.49 = lgetv %j.3;
+        %tmp.50 = agetv %tmp.47 %tmp.49;
+        %tmp.52 = lgetv %j.3;
+        %tmp.53 = 1;
+        %tmp.54 = add %tmp.52 %tmp.53;
+        aputv %tmp.45 %tmp.54 %tmp.50;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 158 20 ]
+        %tmp.55 = lgetv %arr;
+        %tmp.57 = lgetv %tmp.4;
+        %tmp.59 = lgetv %j.3;
+        aputv %tmp.55 %tmp.59 %tmp.57;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_56_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_155_16_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_48_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 154 ]
+        %tmp.62 = lgetv %j.3;
+        %tmp.63 = add %tmp.62 1;
+        lputv %j.3 %tmp.63;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_154_12_for_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_40_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 152 ]
+        %tmp.66 = lgetv %i.2;
+        %tmp.67 = add %tmp.66 1;
+        lputv %i.2 %tmp.67;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_152_8_for_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_150_47_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 164; ]
+    private
+    function addBusStop(name, lat, lon) {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_164_48_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 165 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_8_if_stmt:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_11_begin:
+        %tmp.2 = getv ? :_busStopPositions;
+        %tmp.3 = getv function %tmp.2 :size;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        %tmp.5 = 20;
+        %tmp.6 = lt %tmp.4 %tmp.5;
+        %tmp.7 = dup %tmp.6;
+        bf %tmp.7 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_44_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_44_true:
+        %tmp.8 = self;
+        %tmp.9 = getv function %tmp.8 :busStopExists;
+        %tmp.11 = lgetv %name;
+        %tmp.12 = invoke %tmp.8 %tmp.9(%tmp.11);
+        %tmp.13 = not %tmp.12;
+        %tmp.14 = and %tmp.6 %tmp.13;
+        push %tmp.14;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_44_end:
+        %tmp.15 = phi [%tmp.7 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_11_begin] [%tmp.14 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_44_true] [%tmp.15 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_44_end];
+        bf %tmp.15 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 166 12 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_stop" ]
+        %dist.1 = local;
+        %tmp.17 = getv ? :Math;
+        %tmp.18 = getv function %tmp.17 :round;
+        %tmp.19 = self;
+        %tmp.20 = getv function %tmp.19 :Geodetic_distance_deg;
+        %tmp.22 = getv ? :_pos;
+        %tmp.23 = getv function %tmp.22 :toDegrees;
+        %tmp.24 = invoke %tmp.22 %tmp.23();
+        %tmp.25 = 0;
+        %tmp.26 = agetv %tmp.24 %tmp.25;
+        %tmp.28 = getv ? :_pos;
+        %tmp.29 = getv function %tmp.28 :toDegrees;
+        %tmp.30 = invoke %tmp.28 %tmp.29();
+        %tmp.31 = 1;
+        %tmp.32 = agetv %tmp.30 %tmp.31;
+        %tmp.34 = lgetv %lat;
+        %tmp.36 = lgetv %lon;
+        %tmp.37 = invoke %tmp.19 %tmp.20(%tmp.26, %tmp.32, %tmp.34, %tmp.36);
+        %tmp.38 = invoke %tmp.17 %tmp.18(%tmp.37);
+        %tmp.39 = getv function %tmp.38 :toNumber;
+        %tmp.40 = invoke %tmp.38 %tmp.39();
+        lputv %dist.1 %tmp.40;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 167 12 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_stop" ]
+        %busStop.2 = local;
+        %tmp.44 = getm $;
+        %tmp.45 = getv %tmp.44 :BusStop;
+        %tmp.47 = lgetv %name;
+        %tmp.49 = lgetv %lat;
+        %tmp.51 = lgetv %lon;
+        %tmp.53 = lgetv %dist.1;
+        %tmp.41 = newc %tmp.45 (%tmp.47, %tmp.49, %tmp.51, %tmp.53);
+        lputv %busStop.2 %tmp.41;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 168 12 ]
+        %tmp.55 = getv ? :_busStopPositions;
+        %tmp.56 = getv function %tmp.55 :add;
+        %tmp.58 = lgetv %busStop.2;
+        invoke %tmp.55 %tmp.56(%tmp.58);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_66_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_165_8_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_164_48_stop:
+    }
+    //! Show the result or status of the web request
+    //! @param args Data from the web request, or error message
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 174; ]
+    public
+    function onReceive(args as Dictionary or String or Null) as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_174_76_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 175 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_stmt:
+        %tmp.2 = lgetv %args;
+        %tmp.4 = getv ? :Dictionary;
+        %tmp.5 = isa %tmp.2 %tmp.4;
+        bf %tmp.5 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_176_8_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 177 12 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_end" ]
+        %i.1 = local;
+        %tmp.6 = 0;
+        lputv %i.1 %tmp.6;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_test:
+        %tmp.8 = lgetv %i.1;
+        %tmp.10 = lgetv %args;
+        %tmp.11 = as %tmp.10 { (Dictionary) };
+        %tmp.12 = "elements";
+        %tmp.13 = agetv %tmp.11 %tmp.12;
+        %tmp.14 = getv function %tmp.13 :size;
+        %tmp.15 = invoke %tmp.13 %tmp.14();
+        %tmp.16 = lt %tmp.8 %tmp.15;
+        bf %tmp.16 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 178 16 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_stop" ]
+        %busStop.2 = local;
+        %tmp.18 = lgetv %args;
+        %tmp.19 = as %tmp.18 { (Dictionary) };
+        %tmp.20 = "elements";
+        %tmp.21 = agetv %tmp.19 %tmp.20;
+        %tmp.23 = lgetv %i.1;
+        %tmp.24 = agetv %tmp.21 %tmp.23;
+        lputv %busStop.2 %tmp.24;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 179 16 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_stop" ]
+        %busStopTag.3 = local;
+        %tmp.26 = lgetv %busStop.2;
+        %tmp.27 = "tags";
+        %tmp.28 = agetv %tmp.26 %tmp.27;
+        lputv %busStopTag.3 %tmp.28;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 180 16 ]
+        %tmp.29 = self;
+        %tmp.30 = getv function %tmp.29 :addBusStop;
+        %tmp.32 = lgetv %busStopTag.3;
+        %tmp.33 = "name";
+        %tmp.34 = agetv %tmp.32 %tmp.33;
+        %tmp.36 = lgetv %busStop.2;
+        %tmp.37 = "lat";
+        %tmp.38 = agetv %tmp.36 %tmp.37;
+        %tmp.39 = getv function %tmp.38 :toDouble;
+        %tmp.40 = invoke %tmp.38 %tmp.39();
+        %tmp.42 = lgetv %busStop.2;
+        %tmp.43 = "lon";
+        %tmp.44 = agetv %tmp.42 %tmp.43;
+        %tmp.45 = getv function %tmp.44 :toDouble;
+        %tmp.46 = invoke %tmp.44 %tmp.45();
+        invoke %tmp.29 %tmp.30(%tmp.34, %tmp.40, %tmp.46);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_61_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 177 ]
+        %tmp.49 = lgetv %i.1;
+        %tmp.50 = add %tmp.49 1;
+        lputv %i.1 %tmp.50;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_177_12_for_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_176_8_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_183_13_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 184 12 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_183_13_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_183_13_stop" ]
+        %lines.4 = local;
+        %tmp.51 = self;
+        %tmp.52 = getv function %tmp.51 :split;
+        %tmp.54 = lgetv %args;
+        %tmp.55 = as %tmp.54 { (!Dictionary) };
+        %tmp.56 = '\n';
+        %tmp.57 = invoke %tmp.51 %tmp.52(%tmp.55, %tmp.56);
+        lputv %lines.4 %tmp.57;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 185 12 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_end" ]
+        %i.5 = local;
+        %tmp.58 = 0;
+        lputv %i.5 %tmp.58;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_test:
+        %tmp.60 = lgetv %i.5;
+        %tmp.61 = lgetv %lines.4;
+        %tmp.62 = getv function %tmp.61 :size;
+        %tmp.63 = invoke %tmp.61 %tmp.62();
+        %tmp.64 = lt %tmp.60 %tmp.63;
+        bf %tmp.64 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_50_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 186 16 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_50_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_50_stop" ]
+        %values.6 = local;
+        %tmp.65 = self;
+        %tmp.66 = getv function %tmp.65 :split;
+        %tmp.68 = lgetv %lines.4;
+        %tmp.70 = lgetv %i.5;
+        %tmp.71 = agetv %tmp.68 %tmp.70;
+        %tmp.72 = '|';
+        %tmp.73 = invoke %tmp.65 %tmp.66(%tmp.71, %tmp.72);
+        lputv %values.6 %tmp.73;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 187 16 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_16_if_stmt:
+        %tmp.74 = lgetv %values.6;
+        %tmp.75 = getv function %tmp.74 :size;
+        %tmp.76 = invoke %tmp.74 %tmp.75();
+        %tmp.77 = 2;
+        %tmp.78 = gt %tmp.76 %tmp.77;
+        bf %tmp.78 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_16_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_38_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 188 20 ]
+        %tmp.79 = self;
+        %tmp.80 = getv function %tmp.79 :addBusStop;
+        %tmp.82 = lgetv %values.6;
+        %tmp.83 = 0;
+        %tmp.84 = agetv %tmp.82 %tmp.83;
+        %tmp.86 = lgetv %values.6;
+        %tmp.87 = 1;
+        %tmp.88 = agetv %tmp.86 %tmp.87;
+        %tmp.89 = getv function %tmp.88 :toDouble;
+        %tmp.90 = invoke %tmp.88 %tmp.89();
+        %tmp.92 = lgetv %values.6;
+        %tmp.93 = 2;
+        %tmp.94 = agetv %tmp.92 %tmp.93;
+        %tmp.95 = getv function %tmp.94 :toDouble;
+        %tmp.96 = invoke %tmp.94 %tmp.95();
+        invoke %tmp.79 %tmp.80(%tmp.84, %tmp.90, %tmp.96);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_38_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_187_16_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_50_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 185 ]
+        %tmp.99 = lgetv %i.5;
+        %tmp.100 = add %tmp.99 1;
+        lputv %i.5 %tmp.100;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_185_12_for_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_183_13_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_175_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 193 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_stmt:
+        %tmp.102 = getv ? :_busStopPositions;
+        %tmp.103 = getv function %tmp.102 :size;
+        %tmp.104 = invoke %tmp.102 %tmp.103();
+        %tmp.105 = 0;
+        %tmp.106 = eq %tmp.104 %tmp.105;
+        bf %tmp.106 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_42_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 194 12 ]
+        %tmp.108 = getv ? :_pragueBusView;
+        %tmp.109 = getv function %tmp.108 :setText;
+        %tmp.110 = newa 4;
+        %tmp.111 = "Not found";
+        %tmp.112 = dup %tmp.110;
+        %tmp.113 = aputv %tmp.112 0 %tmp.111;
+        %tmp.115 = getv ? :_pos;
+        %tmp.116 = getv function %tmp.115 :toDegrees;
+        %tmp.117 = invoke %tmp.115 %tmp.116();
+        %tmp.118 = 0;
+        %tmp.119 = agetv %tmp.117 %tmp.118;
+        %tmp.120 = getv function %tmp.119 :toString;
+        %tmp.121 = invoke %tmp.119 %tmp.120();
+        %tmp.122 = dup %tmp.113;
+        %tmp.123 = aputv %tmp.122 1 %tmp.121;
+        %tmp.125 = getv ? :_pos;
+        %tmp.126 = getv function %tmp.125 :toDegrees;
+        %tmp.127 = invoke %tmp.125 %tmp.126();
+        %tmp.128 = 1;
+        %tmp.129 = agetv %tmp.127 %tmp.128;
+        %tmp.130 = getv function %tmp.129 :toString;
+        %tmp.131 = invoke %tmp.129 %tmp.130();
+        %tmp.132 = dup %tmp.123;
+        %tmp.133 = aputv %tmp.132 2 %tmp.131;
+        %tmp.135 = getv ? :_accuracy;
+        %tmp.136 = dup %tmp.133;
+        %tmp.137 = aputv %tmp.136 3 %tmp.135;
+        invoke %tmp.108 %tmp.109(%tmp.137);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_42_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_196_13_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 197 12 ]
+        %tmp.138 = self;
+        %tmp.139 = getv function %tmp.138 :bubbleSort;
+        %tmp.141 = getv ? :_busStopPositions;
+        %tmp.142 = self;
+        %tmp.143 = getv function %tmp.142 :method;
+        %tmp.145 = const :compareByDist;
+        %tmp.146 = invoke %tmp.142 %tmp.143(%tmp.145);
+        invoke %tmp.138 %tmp.139(%tmp.141, %tmp.146);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 198 12 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_end" ]
+        %i.7 = local;
+        %tmp.147 = 0;
+        lputv %i.7 %tmp.147;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_test:
+        %tmp.149 = lgetv %i.7;
+        %tmp.151 = getv ? :_busStopPositions;
+        %tmp.152 = getv function %tmp.151 :size;
+        %tmp.153 = invoke %tmp.151 %tmp.152();
+        %tmp.154 = lt %tmp.149 %tmp.153;
+        bf %tmp.154 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_62_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 199 16 ]
+        %tmp.155 = getv self :_busStopPositions;
+        %tmp.157 = lgetv %i.7;
+        %tmp.158 = agetv %tmp.155 %tmp.157;
+        %tmp.160 = lgetv %i.7;
+        %tmp.161 = 1;
+        %tmp.162 = add %tmp.160 %tmp.161;
+        putv %tmp.158 :_i %tmp.162;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 200 16 ]
+        %tmp.163 = getv self :_busStopPositions;
+        %tmp.165 = lgetv %i.7;
+        %tmp.166 = agetv %tmp.163 %tmp.165;
+        %tmp.168 = getv ? :_busStopPositions;
+        %tmp.169 = getv function %tmp.168 :size;
+        %tmp.170 = invoke %tmp.168 %tmp.169();
+        putv %tmp.166 :_max %tmp.170;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_62_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 198 ]
+        %tmp.173 = lgetv %i.7;
+        %tmp.174 = add %tmp.173 1;
+        lputv %i.7 %tmp.174;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_198_12_for_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 202 12 ]
+        %tmp.175 = self;
+        %tmp.176 = getv function %tmp.175 :getInfo;
+        invoke %tmp.175 %tmp.176();
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 204 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_12_if_stmt:
+        %tmp.178 = getv ? :_refreshSeconds;
+        %tmp.179 = 0;
+        %tmp.180 = gt %tmp.178 %tmp.179;
+        bf %tmp.180 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_36_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 205 16 ]
+        %tmp.182 = getv ? :_timer;
+        %tmp.183 = getv function %tmp.182 :start;
+        %tmp.184 = self;
+        %tmp.185 = getv function %tmp.184 :method;
+        %tmp.187 = const :getInfo;
+        %tmp.188 = invoke %tmp.184 %tmp.185(%tmp.187);
+        %tmp.190 = getv ? :_refreshSeconds;
+        %tmp.191 = 1000;
+        %tmp.192 = mul %tmp.190 %tmp.191;
+        %tmp.193 = true;
+        invoke %tmp.182 %tmp.183(%tmp.188, %tmp.192, %tmp.193);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_36_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_204_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_196_13_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_193_8_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_174_76_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 210; ]
+    private
+    function typeToString(type as Number) as String {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_210_60_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 211 8 ]
+        %tmp.2 = lgetv %type;
+        push %tmp.2;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_211_8_switchCaseBegin:
+        %tmp.3 = dup %tmp.2;
+        %tmp.4 = 0;
+        %tmp.5 = getv function %tmp.3 :equals;
+        %tmp.6 = invoke %tmp.3 %tmp.5 (%tmp.4);
+        bt %tmp.6 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_212_12;
+        %tmp.7 = dup %tmp.2;
+        %tmp.8 = 1;
+        %tmp.9 = getv function %tmp.7 :equals;
+        %tmp.10 = invoke %tmp.7 %tmp.9 (%tmp.8);
+        bt %tmp.10 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_215_12;
+        %tmp.11 = dup %tmp.2;
+        %tmp.12 = 2;
+        %tmp.13 = getv function %tmp.11 :equals;
+        %tmp.14 = invoke %tmp.11 %tmp.13 (%tmp.12);
+        bt %tmp.14 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_218_12;
+        %tmp.15 = dup %tmp.2;
+        %tmp.16 = 3;
+        %tmp.17 = getv function %tmp.15 :equals;
+        %tmp.18 = invoke %tmp.15 %tmp.17 (%tmp.16);
+        bt %tmp.18 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_221_12;
+        %tmp.19 = dup %tmp.2;
+        %tmp.20 = 4;
+        %tmp.21 = getv function %tmp.19 :equals;
+        %tmp.22 = invoke %tmp.19 %tmp.21 (%tmp.20);
+        bt %tmp.22 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_224_12;
+        %tmp.23 = dup %tmp.2;
+        %tmp.24 = 7;
+        %tmp.25 = getv function %tmp.23 :equals;
+        %tmp.26 = invoke %tmp.23 %tmp.25 (%tmp.24);
+        bt %tmp.26 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_227_12;
+        %tmp.27 = dup %tmp.2;
+        %tmp.28 = 11;
+        %tmp.29 = getv function %tmp.27 :equals;
+        %tmp.30 = invoke %tmp.27 %tmp.29 (%tmp.28);
+        bt %tmp.30 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_230_12;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_211_8_defaultCodeBegin;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_212_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 213 16 ]
+        %tmp.31 = "TRAM";
+        ret %tmp.31;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_215_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 216 16 ]
+        %tmp.32 = "METRO";
+        ret %tmp.32;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_218_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 219 16 ]
+        %tmp.33 = "TRAIN";
+        ret %tmp.33;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_221_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 222 16 ]
+        %tmp.34 = "BUS";
+        ret %tmp.34;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_224_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 225 16 ]
+        %tmp.35 = "FERRY";
+        ret %tmp.35;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_227_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 228 16 ]
+        %tmp.36 = "FUNICULAR";
+        ret %tmp.36;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_230_12:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 231 16 ]
+        %tmp.37 = "TROLEYBUS";
+        ret %tmp.37;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_211_8_defaultCodeBegin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_211_8_switchCaseEnd:
+        pop;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 234 8 ]
+        %tmp.38 = "";
+        ret %tmp.38;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_210_60_stop:
+    }
+    //! Show the result or status of the web request
+    //! @param args Data from the web request, or error message
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 239; ]
+    public
+    function onReceiveDepartures(args as Dictionary or String or Null) as Void {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_239_86_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 240 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_8_if_stmt:
+        %tmp.2 = lgetv %args;
+        %tmp.4 = getv ? :Dictionary;
+        %tmp.5 = isa %tmp.2 %tmp.4;
+        bf %tmp.5 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_40_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 242 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_stmt:
+        %tmp.7 = lgetv %args;
+        %tmp.8 = as %tmp.7 { (Dictionary) };
+        %tmp.9 = "departures";
+        %tmp.10 = agetv %tmp.8 %tmp.9;
+        %tmp.11 = getv function %tmp.10 :size;
+        %tmp.12 = invoke %tmp.10 %tmp.11();
+        %tmp.13 = 0;
+        %tmp.14 = eq %tmp.12 %tmp.13;
+        bf %tmp.14 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_47_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 243 16 ]
+        %tmp.16 = getv ? :_pragueBusView;
+        %tmp.17 = getv function %tmp.16 :setText;
+        %tmp.18 = newa 1;
+        %tmp.19 = "Departures not found";
+        %tmp.20 = dup %tmp.18;
+        %tmp.21 = aputv %tmp.20 0 %tmp.19;
+        invoke %tmp.16 %tmp.17(%tmp.21);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_47_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_245_17_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 246 16 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_end" ]
+        %i.1 = local;
+        %tmp.22 = 0;
+        lputv %i.1 %tmp.22;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_test:
+        %tmp.24 = lgetv %i.1;
+        %tmp.26 = getv ? :_busStopPositions;
+        %tmp.27 = getv function %tmp.26 :size;
+        %tmp.28 = invoke %tmp.26 %tmp.27();
+        %tmp.29 = lt %tmp.24 %tmp.28;
+        bf %tmp.29 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_66_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 247 20 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_20_if_stmt:
+        %tmp.31 = getv ? :_busStopPositions;
+        %tmp.33 = lgetv %i.1;
+        %tmp.34 = agetv %tmp.31 %tmp.33;
+        %tmp.35 = getv %tmp.34 :_name;
+        %tmp.36 = getv function %tmp.35 :equals;
+        %tmp.38 = lgetv %args;
+        %tmp.39 = as %tmp.38 { (Dictionary) };
+        %tmp.40 = "stops";
+        %tmp.41 = agetv %tmp.39 %tmp.40;
+        %tmp.42 = 0;
+        %tmp.43 = agetv %tmp.41 %tmp.42;
+        %tmp.44 = "stop_name";
+        %tmp.45 = agetv %tmp.43 %tmp.44;
+        %tmp.46 = invoke %tmp.35 %tmp.36(%tmp.45);
+        bf %tmp.46 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_20_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_20_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_89_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 248 24 ]
+        %tmp.47 = getv self :_busStopPositions;
+        %tmp.49 = lgetv %i.1;
+        %tmp.50 = agetv %tmp.47 %tmp.49;
+        %tmp.51 = newa Array<Departure> 0;
+        putv %tmp.50 :_departures %tmp.51;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 249 24 ]
+        for @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_test @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_incr @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_init:
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_begin" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_end" ]
+        %j.2 = local;
+        %tmp.52 = 0;
+        lputv %j.2 %tmp.52;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_test:
+        %tmp.54 = lgetv %j.2;
+        %tmp.56 = lgetv %args;
+        %tmp.57 = as %tmp.56 { (Dictionary) };
+        %tmp.58 = "departures";
+        %tmp.59 = agetv %tmp.57 %tmp.58;
+        %tmp.60 = getv function %tmp.59 :size;
+        %tmp.61 = invoke %tmp.59 %tmp.60();
+        %tmp.62 = lt %tmp.54 %tmp.61;
+        bf %tmp.62 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_begin:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 250 28 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_stop" ]
+        %d.3 = local;
+        %tmp.64 = lgetv %args;
+        %tmp.65 = as %tmp.64 { (Dictionary) };
+        %tmp.66 = "departures";
+        %tmp.67 = agetv %tmp.65 %tmp.66;
+        %tmp.69 = lgetv %j.2;
+        %tmp.70 = agetv %tmp.67 %tmp.69;
+        lputv %d.3 %tmp.70;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 251 28 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_stop" ]
+        %dep.4 = local;
+        %tmp.74 = getm $;
+        %tmp.75 = getv %tmp.74 :Departure;
+        %tmp.76 = self;
+        %tmp.77 = getv function %tmp.76 :typeToString;
+        %tmp.79 = lgetv %d.3;
+        %tmp.80 = "route";
+        %tmp.81 = agetv %tmp.79 %tmp.80;
+        %tmp.82 = "type";
+        %tmp.83 = agetv %tmp.81 %tmp.82;
+        %tmp.84 = invoke %tmp.76 %tmp.77(%tmp.83);
+        %tmp.86 = lgetv %d.3;
+        %tmp.87 = "route";
+        %tmp.88 = agetv %tmp.86 %tmp.87;
+        %tmp.89 = "short_name";
+        %tmp.90 = agetv %tmp.88 %tmp.89;
+        %tmp.92 = lgetv %d.3;
+        %tmp.93 = "trip";
+        %tmp.94 = agetv %tmp.92 %tmp.93;
+        %tmp.95 = "headsign";
+        %tmp.96 = agetv %tmp.94 %tmp.95;
+        %tmp.98 = lgetv %d.3;
+        %tmp.99 = "departure_timestamp";
+        %tmp.100 = agetv %tmp.98 %tmp.99;
+        %tmp.101 = "minutes";
+        %tmp.102 = agetv %tmp.100 %tmp.101;
+        %tmp.71 = newc %tmp.75 (%tmp.84, %tmp.90, %tmp.96, %tmp.102);
+        lputv %dep.4 %tmp.71;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 252 28 ]
+        %tmp.104 = getv ? :_busStopPositions;
+        %tmp.106 = lgetv %i.1;
+        %tmp.107 = agetv %tmp.104 %tmp.106;
+        %tmp.108 = getv %tmp.107 :_departures;
+        %tmp.109 = getv function %tmp.108 :add;
+        %tmp.111 = lgetv %dep.4;
+        invoke %tmp.108 %tmp.109(%tmp.111);
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_76_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 249 ]
+        %tmp.114 = lgetv %j.2;
+        %tmp.115 = add %tmp.114 1;
+        lputv %j.2 %tmp.115;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_249_24_for_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 254 24 ]
+        %tmp.117 = getv ? :_pragueBusView;
+        %tmp.118 = getv function %tmp.117 :setInfo;
+        %tmp.120 = getv ? :_busStopPositions;
+        %tmp.122 = getv ? :_index;
+        %tmp.123 = agetv %tmp.120 %tmp.122;
+        %tmp.125 = getv ? :_departureStartIndex;
+        invoke %tmp.117 %tmp.118(%tmp.123, %tmp.125);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 255 24 ]
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_89_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_20_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_247_20_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_66_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_incr:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 246 ]
+        %tmp.128 = lgetv %i.1;
+        %tmp.129 = add %tmp.128 1;
+        lputv %i.1 %tmp.129;
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_test;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_246_16_for_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_245_17_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_242_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_40_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_240_8_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_239_86_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 262; ]
+    public
+    function onSelect(clickUp as Boolean) as Boolean {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_262_60_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 263 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_8_if_stmt:
+        %tmp.1 = getm $.Toybox.System;
+        %tmp.2 = getv function %tmp.1 :getDeviceSettings;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        %tmp.4 = getv %tmp.3 :phoneConnected;
+        %tmp.5 = not %tmp.4;
+        bf %tmp.5 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_55_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 264 12 ]
+        %tmp.6 = true;
+        ret %tmp.6;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_55_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_263_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 267 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_8_if_stmt:
+        %tmp.8 = getv ? :_pos;
+        %tmp.9 = null;
+        %tmp.10 = eq %tmp.8 %tmp.9;
+        bf %tmp.10 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_25_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 268 12 ]
+        %tmp.11 = getm $.Toybox.Position;
+        %tmp.12 = getv function %tmp.11 :enableLocationEvents;
+        %tmp.13 = getm $.Toybox.Position;
+        %tmp.14 = getv %tmp.13 :LOCATION_DISABLE;
+        %tmp.15 = self;
+        %tmp.16 = getv function %tmp.15 :method;
+        %tmp.18 = const :onPositionInfo;
+        %tmp.19 = invoke %tmp.15 %tmp.16(%tmp.18);
+        invoke %tmp.11 %tmp.12(%tmp.14, %tmp.19);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 269 12 ]
+        %tmp.21 = getv ? :_pragueBusView;
+        %tmp.22 = getv function %tmp.21 :setText;
+        %tmp.23 = newa 1;
+        %tmp.24 = "Use cached location";
+        %tmp.25 = dup %tmp.23;
+        %tmp.26 = aputv %tmp.25 0 %tmp.24;
+        invoke %tmp.21 %tmp.22(%tmp.26);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 270 12 ]
+        %tmp.27 = self;
+        %tmp.28 = getv function %tmp.27 :onPosition;
+        %tmp.30 = getv ? :Weather;
+        %tmp.31 = getv function %tmp.30 :getCurrentConditions;
+        %tmp.32 = invoke %tmp.30 %tmp.31();
+        %tmp.33 = getv %tmp.32 :observationLocationPosition;
+        %tmp.34 = 9;
+        invoke %tmp.27 %tmp.28(%tmp.33, %tmp.34);
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 271 12 ]
+        %tmp.35 = true;
+        ret %tmp.35;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_25_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_267_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 274 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_8_if_stmt:
+        %tmp.37 = getv ? :_busStopPositions;
+        %tmp.38 = getv function %tmp.37 :size;
+        %tmp.39 = invoke %tmp.37 %tmp.38();
+        %tmp.40 = 0;
+        %tmp.41 = eq %tmp.39 %tmp.40;
+        bf %tmp.41 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_42_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 275 12 ]
+        %tmp.42 = true;
+        ret %tmp.42;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_42_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_274_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 278 8 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_stmt:
+        %tmp.44 = lgetv %clickUp;
+        bf %tmp.44 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_false;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_20_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 279 12 ]
+        %tmp.45 = 0;
+        putv self :_departureStartIndex %tmp.45;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 280 12 ]
+        %tmp.47 = getv ? :_index;
+        %tmp.48 = 1;
+        %tmp.49 = add %tmp.47 %tmp.48;
+        putv self :_index %tmp.49;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 281 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_12_if_stmt:
+        %tmp.51 = getv ? :_index;
+        %tmp.53 = getv ? :_busStopPositions;
+        %tmp.54 = getv function %tmp.53 :size;
+        %tmp.55 = invoke %tmp.53 %tmp.54();
+        %tmp.56 = gte %tmp.51 %tmp.55;
+        bf %tmp.56 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_51_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 282 16 ]
+        %tmp.57 = 0;
+        putv self :_index %tmp.57;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_51_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_281_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_20_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_false:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_285_13_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 286 12 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_285_13_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_285_13_stop" ]
+        %dep.1 = local;
+        %tmp.59 = getv ? :_busStopPositions;
+        %tmp.61 = getv ? :_index;
+        %tmp.62 = agetv %tmp.59 %tmp.61;
+        %tmp.63 = getv %tmp.62 :_departures;
+        lputv %dep.1 %tmp.63;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 287 12 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_12_if_stmt:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_15_begin:
+        %tmp.65 = lgetv %dep.1;
+        %tmp.66 = null;
+        %tmp.67 = ne %tmp.65 %tmp.66;
+        %tmp.68 = dup %tmp.67;
+        bf %tmp.68 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_30_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_30_true:
+        %tmp.69 = lgetv %dep.1;
+        %tmp.70 = as %tmp.69 { (!Null) };
+        %tmp.71 = getv function %tmp.70 :size;
+        %tmp.72 = invoke %tmp.70 %tmp.71();
+        %tmp.73 = 0;
+        %tmp.74 = gt %tmp.72 %tmp.73;
+        %tmp.75 = and %tmp.67 %tmp.74;
+        push %tmp.75;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_30_end:
+        %tmp.76 = phi [%tmp.68 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_15_begin] [%tmp.75 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_30_true] [%tmp.76 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_30_end];
+        bf %tmp.76 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_12_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_46_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 288 16 ]
+        %tmp.78 = getv ? :_departureStartIndex;
+        %tmp.79 = 3;
+        %tmp.80 = add %tmp.78 %tmp.79;
+        putv self :_departureStartIndex %tmp.80;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 289 16 ]
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_16_if_stmt:
+        %tmp.82 = getv ? :_departureStartIndex;
+        %tmp.83 = lgetv %dep.1;
+        %tmp.84 = as %tmp.83 { (!Null) };
+        %tmp.85 = getv function %tmp.84 :size;
+        %tmp.86 = invoke %tmp.84 %tmp.85();
+        %tmp.87 = gte %tmp.82 %tmp.86;
+        bf %tmp.87 @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_16_if_true:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_55_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 290 20 ]
+        %tmp.88 = 0;
+        putv self :_departureStartIndex %tmp.88;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_55_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_16_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_289_16_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_46_stop:
+        goto @C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_12_if_end;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_287_12_if_end:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_285_13_stop:
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_278_8_if_end:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 295 8 ]
+        %tmp.89 = self;
+        %tmp.90 = getv function %tmp.89 :getInfo;
+        invoke %tmp.89 %tmp.90();
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 296 8 ]
+        %tmp.91 = true;
+        ret %tmp.91;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_262_60_stop:
+    }
+    [ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 300; ]
+    function getInitialView() as Array<Views or InputDelegates> or Null {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_300_65_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 301 8 ]
+        [ "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_300_65_start" "C_Project_Garmin_PragueBus_source_PragueBusApp_mc_300_65_stop" ]
+        %inputDelegate.1 = local;
+        %tmp.4 = getm $;
+        %tmp.5 = getv %tmp.4 :InputDelegate;
+        %tmp.6 = self;
+        %tmp.7 = getv function %tmp.6 :method;
+        %tmp.9 = const :onSelect;
+        %tmp.10 = invoke %tmp.6 %tmp.7(%tmp.9);
+        %tmp.1 = newc %tmp.5 (%tmp.10);
+        lputv %inputDelegate.1 %tmp.1;
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 302 8 ]
+        %tmp.11 = newa Array<Views or InputDelegates> 4;
+        %tmp.13 = getv ? :_pragueBusView;
+        %tmp.14 = dup %tmp.11;
+        %tmp.15 = aputv %tmp.14 0 %tmp.13;
+        %tmp.17 = lgetv %inputDelegate.1;
+        %tmp.18 = dup %tmp.15;
+        %tmp.19 = aputv %tmp.18 1 %tmp.17;
+        %tmp.21 = getv ? :_busStopDelegate;
+        %tmp.22 = dup %tmp.19;
+        %tmp.23 = aputv %tmp.22 2 %tmp.21;
+        %tmp.25 = getv ? :_departuresDelegate;
+        %tmp.26 = dup %tmp.23;
+        %tmp.27 = aputv %tmp.26 3 %tmp.25;
+        ret %tmp.27;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_300_65_stop:
+    }
+}
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 307; ]
+function getApp() as PragueBusApp {
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_307_34_start:
+[ "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc" 308 4 ]
+    %tmp.1 = getm $.Toybox.Application;
+    %tmp.2 = getv function %tmp.1 :getApp;
+    %tmp.3 = invoke %tmp.1 %tmp.2();
+    %tmp.4 = as %tmp.3 PragueBusApp;
+    ret %tmp.4;
+C_Project_Garmin_PragueBus_source_PragueBusApp_mc_307_34_stop:
+}
+[ @file = "C:\Project\Garmin\PragueBus\source\PragueBusApp.mc"; @line = 1; ]
+<init> {
+}

@@ -13,7 +13,7 @@ class PragueBusApp extends Application.AppBase {
     private var _departuresDelegate as DeparturesDelegate;
     private var _busStopPositions as Array<BusStop>;
     private var _index as Number;
-    private var _pos as Location.Position;
+    private var _pos as Position.Location or Null;
     private var _accuracy as Number;
     private var _departureStartIndex as Number;
     private var _timer;
@@ -29,6 +29,8 @@ class PragueBusApp extends Application.AppBase {
         _departureStartIndex = 0;
         _refreshSeconds = Properties.getValue("refreshSeconds_prop").toNumber();
         _timer = new Timer.Timer();
+        _accuracy = 0;
+        _pos = null;
     }
 
     // onStart() is called on application start up
@@ -37,30 +39,17 @@ class PragueBusApp extends Application.AppBase {
             _pragueBusView.setText(["Phone not connected"]);
             return;
         }
-        _pragueBusView.setText(["Wait for location","Tap for cached"]);
-        var options = {
-            :acquisitionType => Position.LOCATION_ONE_SHOT,
-            :mode => Position.POSITIONING_MODE_NORMAL
-        };
-
-        if (Position has :CONFIGURATION_GPS_GLONASS_GALILEO_BEIDOU_L1_L5) {
-            options[:configuration] = :CONFIGURATION_GPS_GLONASS_GALILEO_BEIDOU_L1_L5;
-        } else if (Position has :CONFIGURATION_GPS_GALILEO) {
-            options[:constellations] = [ Position.CONSTELLATION_GPS, Position.CONSTELLATION_GALILEO ];
-        } else if (Position has :CONSTELLATION_GPS_GLONASS) {
-            options[:constellations] = [ Position.CONSTELLATION_GPS, Position.CONSTELLATION_GLONASS ];
-        }
-
+        _pragueBusView.setText(["Wait for location","Tap from weather"]);
         if(Properties.getValue("useWeatherPosition_prop")) {
             onPosition(Weather.getCurrentConditions().observationLocationPosition, 9);
         }
         else {
             _pos = Activity.Info.currentLocation;
-            if(_pos) {
+            if(_pos != null) {
                 onPosition(_pos, Activity.Info.currentLocationAccuracy);
             }
             else {
-                Position.enableLocationEvents(options, method(:onPositionInfo));
+                Position.enableLocationEvents( Position.LOCATION_ONE_SHOT, method(:onPositionInfo));
             }
         }
     }
@@ -71,10 +60,10 @@ class PragueBusApp extends Application.AppBase {
         _timer.stop();
     }
 
-    public function onPosition(pos as Location.Position, accuracy as Position.Quality) {
+    public function onPosition(pos as Position.Location, accuracy as Position.Quality or Number) {
         _pos = pos;
         _accuracy = accuracy.toNumber();
-        _busStopDelegate.makeRequest(_pos, Properties.getValue("aroundMeters_prop").toString());
+        _busStopDelegate.makeRequest(_pos, Properties.getValue("aroundMeters_prop").toNumber());
     }
 
     //! Update the current position
@@ -158,7 +147,7 @@ class PragueBusApp extends Application.AppBase {
     }
 
     // A function to implement bubble sort
-    function bubbleSort(arr, compare) {
+    function bubbleSort(arr as Array, compare) {
         var n = arr.size();
         for (var i = 0; i < n - 1; i++) {
             // Last i elements are already in place

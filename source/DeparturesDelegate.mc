@@ -46,7 +46,7 @@ class DeparturesDelegate extends WatchUi.BehaviorDelegate {
     //! Receive the data from the web request
     //! @param responseCode The server response code
     //! @param data Content from a successful request
-    public function onReceive(responseCode as Number, data as Dictionary?) as Void {
+    public function onReceive(responseCode as Number, data as Null or Dictionary or String) as Void {
         if (responseCode == 200) {
             _notify.invoke(data);
         } else {

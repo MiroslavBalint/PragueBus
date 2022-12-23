@@ -1,3 +1,5 @@
+import Toybox.Lang;
+
 class Departure {
     var _type as String;
     var _name as String;
@@ -17,7 +19,7 @@ class BusStop {
     var _lat as Double;
     var _lon as Double;
     var _dist as Number;
-    var _departures as Array<Departure>;
+    var _departures as Array<Departure> or Null;
     var _i as Number;
     var _max as Number;
 
