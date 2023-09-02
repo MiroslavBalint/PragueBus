@@ -74,7 +74,12 @@ class PragueBusView extends WatchUi.View {
         if(info._departures != null) {
             for(var i = start; i < min(start + 3, info._departures.size()); i++) {
                 var d = info._departures[i];
-                _lines.add(d._time + " min " + d._type + " " + d._name);
+                if(d.isEmpty()) {
+                    _lines.add("empty");
+                }
+                else {
+                    _lines.add(d._time + " min " + d._type + " " + d._name);
+                }
                 _lines.add(d._headSign);
             }
         }

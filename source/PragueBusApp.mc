@@ -18,6 +18,7 @@ class PragueBusApp extends Application.AppBase {
     private var _departureStartIndex as Number;
     private var _timer;
     private var _refreshSeconds as Number;
+    private var _showDepartures as Number;
 
     function initialize() {
         AppBase.initialize();
@@ -28,6 +29,7 @@ class PragueBusApp extends Application.AppBase {
         _busStopPositions = [];
         _departureStartIndex = 0;
         _refreshSeconds = Properties.getValue("refreshSeconds_prop").toNumber();
+        _showDepartures = Properties.getValue("showDepartures_prop").toNumber();
         _timer = new Timer.Timer();
         _accuracy = 0;
         _pos = null;
@@ -78,7 +80,7 @@ class PragueBusApp extends Application.AppBase {
         }
 
         var currStop = _busStopPositions[_index];
-        _departuresDelegate.makeRequest(Properties.getValue("maxDepartures_prop").toString(), currStop._name);
+        _departuresDelegate.makeRequest(Properties.getValue("maxDepartures_prop").toString(), currStop, _showDepartures);
         _pragueBusView.setInfo(currStop, _departureStartIndex);
     }
 
@@ -161,10 +163,26 @@ class PragueBusApp extends Application.AppBase {
         }
     }
 
-    private function addBusStop(name, lat, lon) {
-        if(_busStopPositions.size() < 20 && !busStopExists(name)) {
+    private function addBusStop(name, lat, lon, id) {
+        if(id == null) {
+            return;
+        }
+        
+        if(_showDepartures > 0) {
+            for(var i = 0; i < _busStopPositions.size(); i++) {
+                if(_busStopPositions[i]._name == name) {
+                    _busStopPositions[i]._ids.add(id);
+                    return;
+                }
+            }
+        }
+
+        if(_busStopPositions.size() < 20) {
             var dist = Math.round(Geodetic_distance_deg(_pos.toDegrees()[0], _pos.toDegrees()[1], lat, lon)).toNumber();
-            var busStop = new $.BusStop(name, lat, lon, dist);
+            var busStop = new $.BusStop(name, lat, lon, dist, id);
+            if(_showDepartures > 0) {
+                busStop.addTrainPlatform();
+            }
             _busStopPositions.add(busStop);
         }
     }
@@ -177,16 +195,7 @@ class PragueBusApp extends Application.AppBase {
             for(var i = 0; i < args["elements"].size(); i++) {
                 var busStop = args["elements"][i];
                 var busStopTag = busStop["tags"];
-                addBusStop(busStopTag["name"], busStop["lat"].toDouble(), busStop["lon"].toDouble());
-            }
-        }
-        else {
-            var lines = split(args, '\n');
-            for(var i = 0; i < lines.size(); i++) {
-                var values = split(lines[i], '|');
-                if(values.size() > 2) {
-                    addBusStop(values[0], values[1].toDouble(), values[2].toDouble());
-                }
+                addBusStop(busStopTag["name"], busStop["lat"].toDouble(), busStop["lon"].toDouble(), busStopTag["ref:PID"]);
             }
         }
 
@@ -239,21 +248,22 @@ class PragueBusApp extends Application.AppBase {
     public function onReceiveDepartures(args as Dictionary or String or Null) as Void {
         if (args instanceof Dictionary) {
             // Print the arguments duplicated and returned by jsonplaceholder.typicode.com
-            if(args["departures"].size() == 0) {
-                _pragueBusView.setText(["Departures not found"]);
-            }
-            else {
-                for(var i = 0; i < _busStopPositions.size(); i++) {
-                    if(_busStopPositions[i]._name.equals(args["stops"][0]["stop_name"])) {
-                        _busStopPositions[i]._departures = [] as Array<Departure>;
-                        for (var j = 0; j < args["departures"].size(); j++) {
-                            var d = args["departures"][j];
-                            var dep = new $.Departure(typeToString(d["route"]["type"]), d["route"]["short_name"], d["trip"]["headsign"], d["departure_timestamp"]["minutes"]);
-                            _busStopPositions[i]._departures.add(dep);
-                        }
-                        _pragueBusView.setInfo(_busStopPositions[_index], _departureStartIndex);
-                        break;   
+            for(var i = 0; i < _busStopPositions.size(); i++) {
+                if(_busStopPositions[i]._aswId.equals(args["stops"][0]["asw_id"]["node"].toString())) {
+                    _busStopPositions[i]._departures = [] as Array<Departure>;
+                    for (var j = 0; j < args["departures"].size(); j++) {
+                        var d = args["departures"][j];
+                        var dep = new $.Departure(typeToString(d["route"]["type"]), d["route"]["short_name"], d["trip"]["headsign"], d["departure_timestamp"]["minutes"]);
+                        _busStopPositions[i]._departures.add(dep);
                     }
+
+                    if(_busStopPositions[i]._departures.size() == 0) {
+                        var dep = new $.Departure("", "", "", "");
+                        _busStopPositions[i]._departures.add(dep);
+                    }
+                    
+                    _pragueBusView.setInfo(_busStopPositions[_index], _departureStartIndex);
+                    break;
                 }
             }
         }

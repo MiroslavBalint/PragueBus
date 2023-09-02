@@ -1,5 +1,0 @@
-[ @file = "C:\Project\Garmin\PragueBus\source\Config.mc"; @line = 1; @position = 6; ]
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pcm8uYmFsaW50QGdtYWlsLmNvbSIsImlkIjoxNDY1LCJuYW1lIjpudWxsLCJzdXJuYW1lIjpudWxsLCJpYXQiOjE2NjUwMDUwNTgsImV4cCI6MTE2NjUwMDUwNTgsImlzcyI6ImdvbGVtaW8iLCJqdGkiOiIyMjliODExYS1jYTBmLTRmNDEtODYyNi0wNTk5YjhmN2I5M2UifQ.pf9nev6hAAI0tc8ejAd70GJRuxpZ-3t5bKTHw_bwEaQ";
-[ @file = "C:\Project\Garmin\PragueBus\source\Config.mc"; @line = 1; ]
-<init> {
-}

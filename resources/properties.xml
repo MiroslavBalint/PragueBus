@@ -6,6 +6,7 @@
         <property id="maxIndex_prop" type="number">6</property>
         <property id="maxDepartures_prop" type="number">5</property>
         <property id="refreshSeconds_prop" type="number">30</property>
+        <property id="showDepartures_prop" type="number">1</property>
     </properties>
 
     <strings>
@@ -14,6 +15,10 @@
        <string id="maxIndex_title">Max count of stops.</string>
        <string id="maxDepartures_title">Max count of departures.</string>
        <string id="refreshSeconds_title">Refresh departures every count of seconds.</string>
+       <string id="showDepartures_title">What kind of departures should be displayed.</string>
+       <string id="singleBusStop">Single platform.</string>
+       <string id="busStopByName">Bus stop name.</string>
+       <string id="busStopByNode">Bus stop node.</string>
     </strings>
 
     <settings>
@@ -31,6 +36,13 @@
         </setting>
         <setting propertyKey="@Properties.refreshSeconds_prop" title="@Strings.refreshSeconds_title">
             <settingConfig type="numeric" />
+        </setting>
+        <setting propertyKey="@Properties.showDepartures_prop" title="@Strings.showDepartures_title">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.singleBusStop</listEntry>
+                <listEntry value="1">@Strings.busStopByName</listEntry>
+                <listEntry value="2">@Strings.busStopByNode</listEntry>
+            </settingConfig>
         </setting>
     </settings>
 </resources>
