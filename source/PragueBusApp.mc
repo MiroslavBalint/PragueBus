@@ -5,6 +5,7 @@ import Toybox.Position;
 import Toybox.WatchUi;
 import Toybox.System;
 import Toybox.Timer;
+import Toybox.Activity;
 
 class PragueBusApp extends Application.AppBase {
 
@@ -46,15 +47,18 @@ class PragueBusApp extends Application.AppBase {
             onPosition(Weather.getCurrentConditions().observationLocationPosition, 9);
         }
         else {
-            _pos = Activity.Info.currentLocation;
+            var info = Activity.getActivityInfo();
+            if(info != null) {
+                _pos = info.currentLocation;
+            }
             if(_pos != null) {
-                onPosition(_pos, Activity.Info.currentLocationAccuracy);
+                onPosition(_pos, info.currentLocationAccuracy);
             }
-            else {
-                Position.enableLocationEvents( Position.LOCATION_ONE_SHOT, method(:onPositionInfo));
-            }
+        else {
+            Position.enableLocationEvents( Position.LOCATION_ONE_SHOT, method(:onPositionInfo));
         }
     }
+}
 
     // onStop() is called when your application is exiting
     function onStop(state as Dictionary?) as Void {
@@ -70,7 +74,7 @@ class PragueBusApp extends Application.AppBase {
 
     //! Update the current position
     //! @param info Position information
-    public function onPositionInfo(info as Info) as Void {
+    public function onPositionInfo(info as Position.Info) as Void {
         onPosition(info.position, info.accuracy);
     }
 
@@ -193,9 +197,10 @@ class PragueBusApp extends Application.AppBase {
         if(args instanceof Dictionary)
         {
             for(var i = 0; i < args["elements"].size(); i++) {
-                var busStop = args["elements"][i];
-                var busStopTag = busStop["tags"];
-                addBusStop(busStopTag["name"], busStop["lat"].toDouble(), busStop["lon"].toDouble(), busStopTag["ref:PID"]);
+                var elements = args["elements"] as Array<Dictionary>;
+                var busStop = elements[i] as Dictionary;
+                var busStopTag = busStop["tags"] as Dictionary;
+                addBusStop(busStopTag["name"].toString(), busStop["lat"].toDouble(), busStop["lon"].toDouble(), busStopTag["ref:PID"].toString());
             }
         }
 
@@ -249,11 +254,17 @@ class PragueBusApp extends Application.AppBase {
         if (args instanceof Dictionary) {
             // Print the arguments duplicated and returned by jsonplaceholder.typicode.com
             for(var i = 0; i < _busStopPositions.size(); i++) {
-                if(_busStopPositions[i]._aswId.equals(args["stops"][0]["asw_id"]["node"].toString())) {
+                var stops = args["stops"] as Array<Dictionary>;
+                var departureAswId = stops[0]["asw_id"] as Dictionary;
+                if(_busStopPositions[i]._aswId.equals(departureAswId["node"].toString())) {
                     _busStopPositions[i]._departures = [] as Array<Departure>;
-                    for (var j = 0; j < args["departures"].size(); j++) {
-                        var d = args["departures"][j];
-                        var dep = new $.Departure(typeToString(d["route"]["type"]), d["route"]["short_name"], d["trip"]["headsign"], d["departure_timestamp"]["minutes"]);
+                    var departures = args["departures"] as Array<Dictionary>;
+                    for (var j = 0; j < departures.size(); j++) {
+                        var d = departures[j] as Dictionary;
+                        var route = d["route"] as Dictionary;
+                        var trip = d["trip"] as Dictionary;
+                        var departureTimestamp = d["departure_timestamp"] as Dictionary;
+                        var dep = new $.Departure(typeToString(route["type"]), route["short_name"], trip["headsign"], departureTimestamp["minutes"]);
                         _busStopPositions[i]._departures.add(dep);
                     }
 
