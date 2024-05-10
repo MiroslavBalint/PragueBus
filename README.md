@@ -10,6 +10,14 @@ Cached location is retrieved from weather module. It is location of the smartpho
 
 Changelog:
 
+version 1.3
+    Add support for new devices.
+    New SDK 7.1.1
+
+version 1.2
+    Add support for regional buses (4xx, 5xx 6xx)
+    Add support for trains.
+
 version 1.1
     Add support for new devices.
     Add support for button listing.

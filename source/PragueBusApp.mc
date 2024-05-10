@@ -205,7 +205,7 @@ class PragueBusApp extends Application.AppBase {
         }
 
         if(_busStopPositions.size() == 0) {
-            _pragueBusView.setText(["Not found", _pos.toDegrees()[0].toString(), _pos.toDegrees()[1].toString(), _accuracy]);
+            _pragueBusView.setText(["Not found", _pos.toDegrees()[0].toString(), _pos.toDegrees()[1].toString(), _accuracy.toString()]);
         }
         else {
             bubbleSort(_busStopPositions, method(:compareByDist));
@@ -318,9 +318,9 @@ class PragueBusApp extends Application.AppBase {
     }
 
     // Return the initial view of your application here
-    function getInitialView() as Array<Views or InputDelegates>? {
+    function getInitialView() as [Views] or [Views, InputDelegates] {
         var inputDelegate = new $.InputDelegate(method(:onSelect));
-        return [ _pragueBusView, inputDelegate, _busStopDelegate, _departuresDelegate ] as Array<Views or InputDelegates>;
+        return [ _pragueBusView, inputDelegate ];
     }
 
 }
