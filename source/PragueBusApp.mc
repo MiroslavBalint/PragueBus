@@ -200,7 +200,9 @@ class PragueBusApp extends Application.AppBase {
                 var elements = args["elements"] as Array<Dictionary>;
                 var busStop = elements[i] as Dictionary;
                 var busStopTag = busStop["tags"] as Dictionary;
-                addBusStop(busStopTag["name"].toString(), busStop["lat"].toDouble(), busStop["lon"].toDouble(), busStopTag["ref:PID"].toString());
+                if(busStopTag.hasKey("name") && busStopTag.hasKey("ref:PID")) {
+                    addBusStop(busStopTag["name"].toString(), busStop["lat"].toDouble(), busStop["lon"].toDouble(), busStopTag["ref:PID"].toString());
+                }
             }
         }
 
