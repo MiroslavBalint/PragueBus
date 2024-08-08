@@ -10,6 +10,10 @@ Cached location is retrieved from weather module. It is location of the smartpho
 
 Changelog:
 
+version 1.4
+    Fix exception.
+    New SDK 7.2.1
+
 version 1.3
     Add support for new devices.
     New SDK 7.1.1
